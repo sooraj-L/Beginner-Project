@@ -30,3 +30,50 @@ Lets calculate the distance for each ride. To do that we a special function call
 It seems like membership riders have take most number of rides compared to casual riders. Casual riders use bikes on weekends more often while the membership riders ride most on weekdays.
 Audgust witness the highest number of rides for membership riders and july has the highest number of riders for casual riders.
 summer is the peak season for both casual and membership riders 
+
+Next step is to find out whether ride_length is different for each ride_type
+The function we use for that is aggregate function. 
+aggregate(all_trips_v4$ride_length~ all_trips_v4$member_casual + 
+            all_trips_v4$day_of_week,FUN = mean)
+
+**calculating monthly wise average_ride_length for member casual**
+
+print(all_trips_v4 %>%
+  group_by(member_casual,month)%>%
+  summarise(avg_ride_length = mean(ride_length),.groups = 'drop') %>%
+  arrange(month),n=24)
+
+all_trips_v4 %>%
+  group_by(member_casual,day_of_week) %>%
+  summarise(avg_ride_length = mean(ride_distance),.groups = 'drop') %>%
+  arrange(day_of_week)
+
+all_trips_v4 %>%
+  group_by(member_casual,month) %>%
+  summarise(avg_ride_length = mean(ride_distance),.groups = 'drop') %>%
+  arrange(month)
+
+**Finding out how many riders use same station for starting point and end station**
+all_trips_v4 %>%
+  group_by(member_casual)%>%
+  summarise(number_of_rides = n(),.groups = 'drop')
+
+all_trips_v4 %>%
+  group_by(member_casual)%>%
+  filter(ride_distance < 1)%>%
+  summarise(number_of_rides = n(),.groups = 'drop')
+
+From the analysis 5% of casual riders returned their bikes at same starting station while only 2% of membership riders returned their bikes at their start point station.
+
+**Sharing the analysis - Visualizing the findings**
+first we visualize the number of rides commuted by members and casual riders in a day.
+all_trips_v4 %>%
+  group_by(member_casual,day_of_week) %>%
+  summarise(number_of_rides = n(),.groups = 'drop')%>%
+  ggplot(aes(x=day_of_week,y=number_of_rides,fill=member_casual)) +
+  geom_bar(position = 'dodge',stat = 'identity')
+
+In the above code we ggplot function to visualize giving parameters day_of_week in x-axis and number_of_rides in y-axis also fill function has been used to differentiate the plot. Same as above code we find number of rides for month as well.
+
+**Conclusion**
+It leads to me a conclusion that member riders use the bikes for longer commute and they return their bikes very late. While, Casual riders use it for leisure and fun and mostly use on weekends and they return their bikes at their same starting station.
